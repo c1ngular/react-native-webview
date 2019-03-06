@@ -141,8 +141,9 @@ class WebView extends React.Component<WebViewSharedProps, State> {
       this.props.onShouldStartLoadWithRequest,
     );
 
-    const onShouldInterceptRequest=()=>{
-      console.log('tt');
+    const onShouldInterceptRequest=(event: WebViewNavigationEvent)=>{
+      const { onShouldInterceptRequest } = this.props;
+      onShouldInterceptRequest && onShouldInterceptRequest(event);
     }
 
     const webView = (

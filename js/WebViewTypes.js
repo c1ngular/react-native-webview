@@ -352,6 +352,9 @@ export type AndroidWebViewProps = $ReadOnly<{|
    * @platform android
    */
   mixedContentMode?: ?('never' | 'always' | 'compatibility'),
+
+  onShouldInterceptRequest?: (event: WebViewNavigation) => mixed,
+  
 |}>;
 
 export type WebViewSharedProps = $ReadOnly<{|
@@ -431,7 +434,6 @@ export type WebViewSharedProps = $ReadOnly<{|
    * available on the event object, `event.nativeEvent.data`. `data` must be a string.
    */
   onMessage?: (event: WebViewMessageEvent) => mixed,
-
   /**
    * Function that is invoked when the `WebView` is loading.
    */
