@@ -141,6 +141,10 @@ class WebView extends React.Component<WebViewSharedProps, State> {
       this.props.onShouldStartLoadWithRequest,
     );
 
+    const onShouldInterceptRequest=()=>{
+      console.log('tt');
+    }
+
     const webView = (
       <NativeWebView
         ref={this.webViewRef}
@@ -166,6 +170,7 @@ class WebView extends React.Component<WebViewSharedProps, State> {
           this.props.automaticallyAdjustContentInsets
         }
         onShouldStartLoadWithRequest={onShouldStartLoadWithRequest}
+        onShouldInterceptRequest={onShouldInterceptRequest}
         onContentSizeChange={this.props.onContentSizeChange}
         onLoadingStart={this.onLoadingStart}
         onLoadingFinish={this.onLoadingFinish}
