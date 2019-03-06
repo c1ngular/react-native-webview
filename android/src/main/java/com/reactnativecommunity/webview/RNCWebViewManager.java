@@ -15,6 +15,14 @@ import java.util.regex.Pattern;
 import javax.annotation.Nullable;
 
 import java.io.UnsupportedEncodingException;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.net.MalformedURLException;
+import java.net.URI;
+import java.net.URL;
+import java.net.URLConnection;
 import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -39,6 +47,7 @@ import android.webkit.URLUtil;
 import android.webkit.ValueCallback;
 import android.webkit.WebChromeClient;
 import android.webkit.WebResourceRequest;
+import android.webkit.WebResourceResponse;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
@@ -68,6 +77,7 @@ import com.reactnativecommunity.webview.events.TopLoadingStartEvent;
 import com.reactnativecommunity.webview.events.TopMessageEvent;
 import com.reactnativecommunity.webview.events.TopLoadingProgressEvent;
 import com.reactnativecommunity.webview.events.TopShouldStartLoadWithRequestEvent;
+import com.reactnativecommunity.webview.events.TopShouldInterceptRequestEvent;
 import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -76,6 +86,8 @@ import java.util.Map;
 import javax.annotation.Nullable;
 import org.json.JSONException;
 import org.json.JSONObject;
+import android.util.Log;
+
 
 /**
  * Manages instances of {@link WebView}
@@ -92,6 +104,7 @@ import org.json.JSONObject;
  *  - topLoadingStart
  *  - topLoadingProgress
  *  - topShouldStartLoadWithRequest
+ *  - topShouldInterceptRequest
  *
  * Each event will carry the following properties:
  *  - target - view's react tag
@@ -170,6 +183,40 @@ public class RNCWebViewManager extends SimpleViewManager<WebView> {
       dispatchEvent(view, new TopShouldStartLoadWithRequestEvent(view.getId(), request.getUrl().toString()));
       return true;
     }
+
+    @Override
+    public WebResourceResponse shouldInterceptRequest(WebView view, String url) {
+      dispatchEvent(view, new TopShouldInterceptRequestEvent(view.getId(), url));
+      Log.d("captured: ", url); 
+      return super.shouldInterceptRequest(view, url);
+    }
+
+
+    @TargetApi(Build.VERSION_CODES.N)
+    @Override
+    public WebResourceResponse shouldInterceptRequest(WebView view, WebResourceRequest request) {
+      dispatchEvent(view, new TopShouldInterceptRequestEvent(view.getId(), request.getUrl().toString()));
+      Log.d("captured: ", request.getUrl().toString()); 
+      return super.shouldInterceptRequest(view, request);
+    }
+    
+    /* following method implimentation is still pending */
+    @Nullable
+    private WebResourceResponse getWebResourceResponse(String url) {
+        try {
+            if (url != null) {
+                URL newUrl = new URL(url);
+                URLConnection connection = newUrl.openConnection();
+                return new WebResourceResponse(connection.getContentType(), connection.getHeaderField("encoding"), connection.getInputStream());
+            }
+        } catch (MalformedURLException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }    
+
 
     @Override
     public void onReceivedError(
@@ -721,6 +768,7 @@ public class RNCWebViewManager extends SimpleViewManager<WebView> {
     }
     export.put(TopLoadingProgressEvent.EVENT_NAME, MapBuilder.of("registrationName", "onLoadingProgress"));
     export.put(TopShouldStartLoadWithRequestEvent.EVENT_NAME, MapBuilder.of("registrationName", "onShouldStartLoadWithRequest"));
+    export.put(TopShouldInterceptRequestEvent.EVENT_NAME, MapBuilder.of("registrationName", "onShouldInterceptRequest"));
     return export;
   }
 
