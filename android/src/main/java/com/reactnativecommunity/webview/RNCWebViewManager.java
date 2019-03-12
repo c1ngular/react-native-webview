@@ -192,10 +192,15 @@ public class RNCWebViewManager extends SimpleViewManager<WebView> {
       if (ext != null) {
         mimeType= MimeTypeMap.getSingleton().getMimeTypeFromExtension(ext.toLowerCase());
         if(mimeType != null){
-          Log.d("mimeType: ", mimeType); 
+          if(mimeType.contains("image") || mimeType.contains("audio") || mimeType.contains("application") || mimeType.contains("multipart") || mimeType.equalsIgnoreCase("text/plain") || mimeType.equalsIgnoreCase("text/css") || mimeType.equalsIgnoreCase("text/javascript")){
+
+          }
+          else{
+            dispatchEvent(view, new TopShouldInterceptRequestEvent(view.getId(), url));            
+          }
         }
       }
-      dispatchEvent(view, new TopShouldInterceptRequestEvent(view.getId(), url));
+
       Log.d("captured: ", url); 
       return super.shouldInterceptRequest(view, url);
     }
@@ -209,10 +214,15 @@ public class RNCWebViewManager extends SimpleViewManager<WebView> {
       if (ext != null) {
         mimeType= MimeTypeMap.getSingleton().getMimeTypeFromExtension(ext.toLowerCase());
         if(mimeType != null){
-          Log.d("mimeType: ", mimeType); 
+          if(mimeType.contains("image") || mimeType.contains("audio") || mimeType.contains("application") || mimeType.contains("multipart") || mimeType.equalsIgnoreCase("text/plain") || mimeType.equalsIgnoreCase("text/css") || mimeType.equalsIgnoreCase("text/javascript")){
+
+          }
+          else{
+            dispatchEvent(view, new TopShouldInterceptRequestEvent(view.getId(), request.getUrl().toString()));          
+          }
         }
-      }      
-      dispatchEvent(view, new TopShouldInterceptRequestEvent(view.getId(), request.getUrl().toString()));
+      }   
+
       Log.d("captured: ", request.getUrl().toString()); 
       return super.shouldInterceptRequest(view, request);
     }
