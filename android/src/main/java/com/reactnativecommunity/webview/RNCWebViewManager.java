@@ -51,6 +51,7 @@ import android.webkit.WebResourceResponse;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
+import android.webkit.MimeTypeMap;
 
 import com.facebook.common.logging.FLog;
 import com.facebook.react.bridge.Arguments;
@@ -186,6 +187,14 @@ public class RNCWebViewManager extends SimpleViewManager<WebView> {
 
     @Override
     public WebResourceResponse shouldInterceptRequest(WebView view, String url) {
+      String ext=MimeTypeMap.getFileExtensionFromUrl(url);
+      String mimeType=null;
+      if (ext != null) {
+        mimeType= MimeTypeMap.getSingleton().getMimeTypeFromExtension(ext.toLowerCase());
+        if(mimeType != null){
+          Log.d("mimeType: ", mimeType); 
+        }
+      }
       dispatchEvent(view, new TopShouldInterceptRequestEvent(view.getId(), url));
       Log.d("captured: ", url); 
       return super.shouldInterceptRequest(view, url);
@@ -195,6 +204,14 @@ public class RNCWebViewManager extends SimpleViewManager<WebView> {
     @TargetApi(Build.VERSION_CODES.N)
     @Override
     public WebResourceResponse shouldInterceptRequest(WebView view, WebResourceRequest request) {
+      String ext=MimeTypeMap.getFileExtensionFromUrl(request.getUrl().toString());
+      String mimeType=null;
+      if (ext != null) {
+        mimeType= MimeTypeMap.getSingleton().getMimeTypeFromExtension(ext.toLowerCase());
+        if(mimeType != null){
+          Log.d("mimeType: ", mimeType); 
+        }
+      }      
       dispatchEvent(view, new TopShouldInterceptRequestEvent(view.getId(), request.getUrl().toString()));
       Log.d("captured: ", request.getUrl().toString()); 
       return super.shouldInterceptRequest(view, request);
